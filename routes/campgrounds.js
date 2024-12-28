@@ -4,6 +4,7 @@ const Campground = require('../models/campground');
 const ExpressError = require('../utils/ExpressError')
 const catchAsync = require('../utils/catchAsync')
 const { campgroundSchema }  = require('../schemas')
+const { isLoggedIn } = require('../middleware');
 
 // Middleware for serverside validation
 const validateCampground = (req,res,next) => {
@@ -22,7 +23,7 @@ router.get('/' ,catchAsync( async (req, res)=>{
 }))
 
 // order matter here , if otherwise new will be treated as id , and page doesn't load.
-router.get('/new' , (req,res) =>{
+router.get('/new' , isLoggedIn , (req,res) =>{ 
     res.render('campgrounds/new' )
 })
 
@@ -52,7 +53,7 @@ router.get('/:id/edit' ,catchAsync( async(req,res) =>{
     res.render('campgrounds/edit' , { campground });
 }))
 
-router.put('/:id' ,validateCampground, catchAsync( async(req,res) =>{
+router.put('/:id' , isLoggedIn, validateCampground, catchAsync( async(req,res) =>{
     const {id}  = req.params;
     const campground = await Campground.findByIdAndUpdate(id, {...req.body.campground} );
     req.flash('success','Successfully update Campground!')

@@ -45,30 +45,22 @@ app.use(express.static(path.join(__dirname,'public')))
 app.use(mongoSanitize());
 
 const scriptSrcUrls = [
-    "https://stackpath.bootstrapcdn.com/",
-    "https://kit.fontawesome.com/",
-    "https://cdnjs.cloudflare.com/",
+    "https://stackpath.bootstrapcdn.com",
+    "https://kit.fontawesome.com",
+    "https://cdnjs.cloudflare.com",
     "https://cdn.jsdelivr.net",
-    "https://cdn.maptiler.com/", 
+    "https://cdn.maptiler.com", 
 ];
 const styleSrcUrls = [
-    "https://kit-free.fontawesome.com/",
-    "https://stackpath.bootstrapcdn.com/",
-    "https://fonts.googleapis.com/",
-    "https://use.fontawesome.com/",
+    "https://kit-free.fontawesome.com",
+    "https://stackpath.bootstrapcdn.com",
+    "https://fonts.googleapis.com",
+    "https://use.fontawesome.com",
     "https://cdn.jsdelivr.net",
-    "https://cdn.maptiler.com/",
+    "https://cdn.maptiler.com",
 ];
 const connectSrcUrls = [
-    "https://api.maptiler.com/", 
-];
-
-imgSrc: [
-    // all your other existing code
-    // "https://res.cloudinary.com/dllcqqxkf/",
-    // "https://images.unsplash.com/",
-    // add this:
-    "https://api.maptiler.com/",
+    "https://api.maptiler.com", 
 ];
 
 const fontSrcUrls = [];
@@ -89,6 +81,7 @@ app.use(
                 "data:",
                 "https://res.cloudinary.com/dllcqqxkf/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
                 "https://images.unsplash.com",
+                "https://api.maptiler.com",
             ],
             fontSrc: ["'self'", ...fontSrcUrls],
         },

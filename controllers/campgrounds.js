@@ -18,16 +18,12 @@ module.exports.createCampground = async(req,res,next) =>{
     const geoData = await maptilerClient.geocoding.forward(req.body.campground.location, { limit: 1 });
     const campground = new Campground(req.body.campground);
     campground.geometry = geoData.features[0].geometry;
-    console.log(geoData);
-    res.send("OK")
-    
-    // campground.images = req.files.map(f => ({url : f.path ,filename: f.filename}));
-    // campground.author= req.user._id;
-    // await campground.save();
-    // console.log(campground);
-    
-    // req.flash('success' , 'Succesfully make a new campground!');
-    // res.redirect(`/campgrounds/${campground._id}`);
+    campground.images = req.files.map(f => ({url : f.path ,filename: f.filename}));
+    campground.author= req.user._id;
+    await campground.save();
+    console.log(campground);
+    req.flash('success' , 'Succesfully make a new campground!');
+    res.redirect(`/campgrounds/${campground._id}`);
 }
 
 module.exports.showCampground = async (req,res)=>{

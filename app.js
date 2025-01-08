@@ -2,25 +2,29 @@ if(process.env.NODE_ENV !== "production"){
     require('dotenv').config();
 } 
 
-console.log(process.env.SECRET);
-
 const express= require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
+
 const flash = require('connect-flash');
 const ExpressError = require('./utils/ExpressError')
 const methodOverride = require('method-override');
 const passport = require('passport');
 const LocalStatergy = require('passport-local');
 const User = require('./models/user')
+const mongoSanitize = require('express-mongo-sanitize');
+const helmet = require('helmet');
 
 const userRoutes = require('./routes/users')
 const campgroundRoutes = require('./routes/campgrounds')
 const reviewRoutes = require('./routes/reviews')
+// const dbUrl = process.env.DB_URL;
+const dbUrl = 'mongodb://localhost:27017/camp-trails';
 
-mongoose.connect('mongodb://localhost:27017/camp-trails' )
+mongoose.connect(dbUrl)
 
 const db = mongoose.connection;
 db.on("error" , console.error.bind(console, "connection error:"))
@@ -39,13 +43,83 @@ app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'));
 
 app.use(express.static(path.join(__dirname,'public')))
+app.use(mongoSanitize());
+
+const scriptSrcUrls = [
+    "https://stackpath.bootstrapcdn.com/",
+    "https://kit.fontawesome.com/",
+    "https://cdnjs.cloudflare.com/",
+    "https://cdn.jsdelivr.net",
+    "https://cdn.maptiler.com/", 
+];
+const styleSrcUrls = [
+    "https://kit-free.fontawesome.com/",
+    "https://stackpath.bootstrapcdn.com/",
+    "https://fonts.googleapis.com/",
+    "https://use.fontawesome.com/",
+    "https://cdn.jsdelivr.net",
+    "https://cdn.maptiler.com/",
+];
+const connectSrcUrls = [
+    "https://api.maptiler.com/", 
+];
+
+imgSrc: [
+    // all your other existing code
+    // "https://res.cloudinary.com/dllcqqxkf/",
+    // "https://images.unsplash.com/",
+    // add this:
+    "https://api.maptiler.com/",
+];
+
+const fontSrcUrls = [];
+
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: [],
+            connectSrc: ["'self'", ...connectSrcUrls],
+            scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+            styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+            workerSrc: ["'self'", "blob:"],
+            childSrc: ["blob:"],
+            objectSrc: [],
+            imgSrc: [
+                "'self'",
+                "blob:",
+                "data:",
+                "https://res.cloudinary.com/dllcqqxkf/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
+                "https://images.unsplash.com",
+            ],
+            fontSrc: ["'self'", ...fontSrcUrls],
+        },
+    })
+);
+
+
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    touchAfter: 24 * 60 * 60,   //tot. no .of seconds
+    crypto: {
+        secret: 'thisshouldbeabettersecret!'
+    }
+});
+
+store.on("error", function(e){
+    console.log("Session error" , e );
+    
+})
 
 const sessionConfig = {
+    store,
+    name: 'session',
     secret: 'ThisShouldbeabettersecret',
     resave: false,
     saveUninitialized: true,
     cookie:{
         httpsOnly: true,
+        // For changes can only be made on HTTPS only connection to the cookie session.
+        // secure:true,    
         expires: Date.now() + 1000*60*60*24*7,
         maxAge: 1000* 60 * 60 * 24 * 7 
     }

@@ -1,15 +1,19 @@
 <% layout('layouts/boilerplate') %>
+    <div id="cluster-map" ></div>
     <h1>All Campgrounds</h1>
-
     <div>
         <a href="/campgrounds/new">Add Campground</a>
     </div>
     <ul>
     <% for(let campground of campgrounds){ %>
-        <div class="card" mb-3>
+        <div class="card mb-3">
             <div class="row">
                 <div class="col-md-4">
+                    <% if(campground.images.length){ %>
                     <img class="img-fluid" alt="" src="<%=campground.images[0].url%>">
+                    <% } else{%>
+                    <img class="img-fluid" alt="" src="https://res.cloudinary.com/dllcqqxkf/image/upload/v1736008835/CampTrails/jpodkxel5mhgg0voecto.jpg">
+                    <% } %>
                 </div>
                 <div class="col-md-8">
                     <div class="card-body">
@@ -26,5 +30,11 @@
     <% } %>
     </ul>
 
+<script>
+    // Transfers this variable to clusterMap.js file
+    const maptilerApiKey = '<%- process.env.MAPTILER_API_KEY %>';
+    // To not get error related mongoose virtual toObject, use -> ``
+    const campgrounds = {features : <%- JSON.stringify(campgrounds) %>};
+</script>
 
-    
+<script src="/javascripts/clusterMap.js"></script> 

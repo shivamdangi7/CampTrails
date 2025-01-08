@@ -21,8 +21,7 @@ const helmet = require('helmet');
 const userRoutes = require('./routes/users')
 const campgroundRoutes = require('./routes/campgrounds')
 const reviewRoutes = require('./routes/reviews')
-const dbUrl = process.env.DB_URL;
-// const dbUrl = 'mongodb://localhost:27017/camp-trails';
+const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/camp-trails' ;
 
 mongoose.connect(dbUrl)
 
@@ -96,12 +95,13 @@ app.use(
     })
 );
 
+const secret = process.env.SECRET || 'thisshouldbeabettersecret!' ;
 
 const store = MongoStore.create({
     mongoUrl: dbUrl,
     touchAfter: 24 * 60 * 60,   //tot. no .of seconds
     crypto: {
-        secret: 'thisshouldbeabettersecret!'
+        secret 
     }
 });
 
@@ -113,7 +113,7 @@ store.on("error", function(e){
 const sessionConfig = {
     store,
     name: 'session',
-    secret: 'ThisShouldbeabettersecret',
+    secret,
     resave: false,
     saveUninitialized: true,
     cookie:{
@@ -165,6 +165,7 @@ app.use((err,req,res,next)=>{
     // this type of error only works with async errors
 })
 
-app.listen('3000' , ()=>{
-    console.log("Serving on port 3000")
+const port = process.env.PORT || 3000;
+app.listen(port , ()=>{
+    console.log(`Serving on port ${port}`)
 });

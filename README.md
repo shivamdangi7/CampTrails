@@ -18,7 +18,6 @@ CampTrails is a web application that helps outdoor enthusiasts discover and shar
   - HTML5
   - CSS3
   - JavaScript
-  - React.js
 - Backend:
   - Node.js
   - Express.js
